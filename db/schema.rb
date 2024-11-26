@@ -11,17 +11,17 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.0].define(version: 1) do
-  create_table "creators", primary_key: "label", id: :string, force: :cascade do |t|
-    t.string "image", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "atoms", primary_key: "label", id: :string, force: :cascade do |t|
     t.string "creator_label", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["creator_label"], name: "index_atoms_on_creator_label"
+  end
+
+  create_table "creators", primary_key: "label", id: :string, force: :cascade do |t|
+    t.string "image", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "triples", id: :string, force: :cascade do |t|
