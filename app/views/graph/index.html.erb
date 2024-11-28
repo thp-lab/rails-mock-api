@@ -1,0 +1,151 @@
+<div class="container">
+    <div class="column">
+        <div class="header">Subject</div>
+        <input type="text" id="subject-input" placeholder="Entrez un sujet">
+        <div class="entry-list" id="subject-list"></div>
+    </div>
+
+    <div class="column">
+        <div class="header">Predicate</div>
+        <input type="text" id="predicate-input" placeholder="Entrez un prédicat">
+        <div class="entry-list" id="predicate-list"></div>
+    </div>
+
+    <div class="column">
+        <div class="header">Object</div>
+        <input type="text" id="object-input" placeholder="Entrez un objet">
+        <div class="entry-list" id="object-list"></div>
+    </div>
+</div>
+
+<div class="add-button-container">
+    <button id="add-button" onclick="addEntry()">Ajouter un triplet</button>
+</div>
+
+<div class="view-graph">
+    <button onclick="openGraphView()">Voir le Graphe</button>
+</div>
+
+<div id="status" class="status"></div>
+<div id="loading" class="loading" style="display: none;">Chargement...</div>
+<div id="load-more" class="load-more">
+    <button id="load-more-button" onclick="loadMoreItems()">Charger plus</button>
+</div>
+
+<%= javascript_tag do %>
+    let allAtoms = <%= raw @atoms.to_json %>;
+    let displayedCount = 0;
+    const itemsPerPage = 10;
+    let graphWindow = null;
+
+    // Initialiser l'affichage au chargement
+    window.addEventListener('load', () => {
+        clearLists();
+        displayNextBatch();
+    });
+
+    function openGraphView() {
+        if (graphWindow && !graphWindow.closed) {
+            graphWindow.focus();
+        } else {
+            graphWindow = window.open('http://localhost:3002', 'GraphView', 'width=1200,height=800');
+        }
+    }
+
+    function displayNextBatch() {
+        const nextBatch = allAtoms.slice(displayedCount, displayedCount + itemsPerPage);
+        nextBatch.forEach(atom => {
+            addToList('subject-list', atom.label);
+            addToList('predicate-list', atom.label);
+            addToList('object-list', atom.label);
+        });
+        
+        displayedCount += itemsPerPage;
+        
+        // Hide "Load More" button if all items are displayed
+        document.getElementById('load-more').style.display = 
+            displayedCount >= allAtoms.length ? 'none' : 'block';
+    }
+
+    function loadMoreItems() {
+        displayNextBatch();
+    }
+
+    function clearLists() {
+        document.getElementById('subject-list').innerHTML = '';
+        document.getElementById('predicate-list').innerHTML = '';
+        document.getElementById('object-list').innerHTML = '';
+        displayedCount = 0;
+    }
+
+    async function addEntry() {
+        const subject = document.getElementById('subject-input').value;
+        const predicate = document.getElementById('predicate-input').value;
+        const object = document.getElementById('object-input').value;
+
+        if (subject && predicate && object) {
+            try {
+                document.getElementById('add-button').disabled = true;
+
+                const data = {
+                    triple: {
+                        subject_label: subject,
+                        predicate_label: predicate,
+                        object_label: object
+                    }
+                };
+
+                const response = await fetch('/api/v1/graph', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Recharger la page pour obtenir la liste mise à jour
+                    window.location.reload();
+
+                    // Notifier l'application React
+                    if (graphWindow && !graphWindow.closed) {
+                        graphWindow.postMessage('refreshData', 'http://localhost:3002');
+                        if (graphWindow.refreshGraphData) {
+                            graphWindow.refreshGraphData();
+                        }
+                    }
+                } else {
+                    showStatus(`Erreur lors de l'ajout du triplet: ${result.message}`, false);
+                }
+            } catch (error) {
+                showStatus('Erreur de connexion au serveur', false);
+                console.error('Error:', error);
+            } finally {
+                document.getElementById('add-button').disabled = false;
+            }
+        }
+    }
+
+    function addToList(listId, text) {
+        const list = document.getElementById(listId);
+        const entry = document.createElement('div');
+        entry.className = 'entry';
+        entry.textContent = text;
+        list.appendChild(entry);
+    }
+
+    function showStatus(message, isSuccess) {
+        const status = document.getElementById('status');
+        status.textContent = message;
+        status.className = `status ${isSuccess ? 'success' : 'error'}`;
+        status.style.display = 'block';
+
+        setTimeout(() => {
+            status.style.display = 'none';
+        }, 3000);
+    }
+<% end %>
