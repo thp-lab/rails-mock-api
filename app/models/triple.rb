@@ -16,9 +16,18 @@ class Triple < ApplicationRecord
   # Computed ID based on components
   before_validation :set_computed_id
 
+  # Label method for when Triple is used as a component
+  def label
+    id
+  end
+
   private
 
   def set_computed_id
-    self.id = "#{subject.label} #{predicate.label} #{object.label}"
+    subject_label = subject.respond_to?(:label) ? subject.label : subject.id
+    predicate_label = predicate.respond_to?(:label) ? predicate.label : predicate.id
+    object_label = object.respond_to?(:label) ? object.label : object.id
+    
+    self.id = "#{subject_label} #{predicate_label} #{object_label}"
   end
 end
