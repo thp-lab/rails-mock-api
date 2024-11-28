@@ -1,4 +1,4 @@
-class Api::V1::GraphController < ApplicationController
+class Api::V1::GraphController < Api::BaseController
   def index
     render_graph_data
   end
@@ -10,14 +10,6 @@ class Api::V1::GraphController < ApplicationController
   private
 
   def render_graph_data
-    atoms = Atom.all.map do |atom|
-      {
-        id: atom.label,
-        label: atom.label,
-        creator: atom.creator.label
-      }
-    end
-
     triples = Triple.all.map do |triple|
       {
         id: triple.id,
@@ -45,7 +37,6 @@ class Api::V1::GraphController < ApplicationController
       data: {
         triples: triples
       }
-
     }
   end
 end
