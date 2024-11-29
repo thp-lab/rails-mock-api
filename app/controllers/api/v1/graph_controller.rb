@@ -50,23 +50,20 @@ class Api::V1::GraphController < Api::BaseController
         image: 'thp_logo.png'
       )
 
-      subject = Atom.find_or_create_by!(
-        label: triple_params[:subject_label],
-        creator_label: creator.label,
-        creator: creator
-      )
+      subject = Atom.where(label: triple_params[:subject_label]).first_or_initialize.tap do |atom|
+        atom.creator = creator
+        atom.save!
+      end
 
-      predicate = Atom.find_or_create_by!(
-        label: triple_params[:predicate_label],
-        creator_label: creator.label,
-        creator: creator
-      )
+      predicate = Atom.where(label: triple_params[:predicate_label]).first_or_initialize.tap do |atom|
+        atom.creator = creator
+        atom.save!
+      end
 
-      object = Atom.find_or_create_by!(
-        label: triple_params[:object_label],
-        creator_label: creator.label,
-        creator: creator
-      )
+      object = Atom.where(label: triple_params[:object_label]).first_or_initialize.tap do |atom|
+        atom.creator = creator
+        atom.save!
+      end
 
       triple = Triple.create!(
         subject: subject,
