@@ -83,7 +83,7 @@ end
     end
   end
 
-  puts "Créé étudiant #{i + 1} : #{full_name}" if (i + 1) % 10 == 0
+  puts "Created student #{i + 1}: #{full_name}" if (i + 1) % 10 == 0
 end
 
-puts 'Seeding terminé avec succès !'
+puts 'Seeding completed successfully!'
