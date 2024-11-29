@@ -28,7 +28,7 @@ class Api::V1::GraphController < Api::BaseController
         creator: creator
       )
 
-      triple = Triple.find_or_create_by!(
+      triple = Triple.create!(
         subject: subject,
         predicate: predicate,
         object: object,
@@ -50,14 +50,6 @@ class Api::V1::GraphController < Api::BaseController
   end
 
   def render_graph_data
-    atoms = Atom.all.map do |atom|
-      {
-        id: atom.label,
-        label: atom.label,
-        type: 'Atom'
-      }
-    end
-
     triples = Triple.all.map do |triple|
       {
         id: triple.id,
@@ -79,6 +71,14 @@ class Api::V1::GraphController < Api::BaseController
           type: triple.object_type
         },
         creator: triple.creator.label
+      }
+    end
+
+    atoms = Atom.all.map do |atom|
+      {
+        id: atom.label,
+        label: atom.label,
+        type: 'Atom'
       }
     end
 
