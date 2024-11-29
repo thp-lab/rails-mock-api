@@ -1,81 +1,114 @@
 <div class="container">
     <div class="column">
         <div class="header">Subject</div>
-        <input type="text" id="subject-input" placeholder="Entrez un sujet">
+        <input type="text" id="subject-input" placeholder="Entrez un sujet" oninput="filterList('subject')">
         <div class="entry-list" id="subject-list"></div>
     </div>
 
     <div class="column">
         <div class="header">Predicate</div>
-        <input type="text" id="predicate-input" placeholder="Entrez un prédicat">
+        <input type="text" id="predicate-input" placeholder="Entrez un prédicat" oninput="filterList('predicate')">
         <div class="entry-list" id="predicate-list"></div>
     </div>
 
     <div class="column">
         <div class="header">Object</div>
-        <input type="text" id="object-input" placeholder="Entrez un objet">
+        <input type="text" id="object-input" placeholder="Entrez un objet" oninput="filterList('object')">
         <div class="entry-list" id="object-list"></div>
     </div>
 </div>
 
 <div class="add-button-container">
-    <button id="add-button" onclick="addEntry()">Ajouter un triplet</button>
-</div>
-
-<div class="view-graph">
-    <button onclick="openGraphView()">Voir le Graphe</button>
+    <button id="add-button" onclick="addEntry()">Créer un triplet</button>
 </div>
 
 <div id="status" class="status"></div>
-<div id="loading" class="loading" style="display: none;">Chargement...</div>
-<div id="load-more" class="load-more">
-    <button id="load-more-button" onclick="loadMoreItems()">Charger plus</button>
-</div>
 
-<%= javascript_tag do %>
-    let allAtoms = <%= raw @atoms.to_json %>;
-    let displayedCount = 0;
-    const itemsPerPage = 10;
-    let graphWindow = null;
+<script>
+    let allAtoms = [];
+    let filteredAtoms = {
+        subject: [],
+        predicate: [],
+        object: []
+    };
 
-    // Initialiser l'affichage au chargement
-    window.addEventListener('load', () => {
-        clearLists();
-        displayNextBatch();
-    });
+    // Charger tous les atomes au démarrage
+    window.addEventListener('load', loadAtoms);
 
-    function openGraphView() {
-        if (graphWindow && !graphWindow.closed) {
-            graphWindow.focus();
-        } else {
-            graphWindow = window.open('http://localhost:3002', 'GraphView', 'width=1200,height=800');
+    async function loadAtoms() {
+        try {
+            const response = await fetch('/api/v1/graph');
+            const result = await response.json();
+            
+            // Extraire tous les atomes uniques
+            const atoms = new Set();
+            
+            // Ajouter les Atoms simples
+            result.data.atoms.forEach(item => {
+                if (item.type === 'Atom') {
+                    atoms.add(item.label);
+                }
+            });
+
+            // Extraire les atomes des Triples
+            result.data.atoms.forEach(item => {
+                if (item.type === 'Triple') {
+                    atoms.add(item.subject.label);
+                    atoms.add(item.predicate.label);
+                    atoms.add(item.object.label);
+                }
+            });
+
+            allAtoms = Array.from(atoms);
+            
+            // Initialiser les listes filtrées
+            filteredAtoms.subject = [...allAtoms];
+            filteredAtoms.predicate = [...allAtoms];
+            filteredAtoms.object = [...allAtoms];
+
+            // Afficher les listes
+            updateLists();
+        } catch (error) {
+            console.error('Erreur lors du chargement des atomes:', error);
+            showStatus('Erreur lors du chargement des atomes', false);
         }
     }
 
-    function displayNextBatch() {
-        const nextBatch = allAtoms.slice(displayedCount, displayedCount + itemsPerPage);
-        nextBatch.forEach(atom => {
-            addToList('subject-list', atom.label);
-            addToList('predicate-list', atom.label);
-            addToList('object-list', atom.label);
+    function filterList(type) {
+        const input = document.getElementById(`${type}-input`);
+        const searchTerm = input.value.toLowerCase();
+
+        // Filtrer les atomes qui correspondent au terme de recherche
+        filteredAtoms[type] = allAtoms.filter(atom => 
+            atom.toLowerCase().includes(searchTerm)
+        );
+
+        // Mettre à jour l'affichage de la liste
+        updateList(type);
+    }
+
+    function updateLists() {
+        updateList('subject');
+        updateList('predicate');
+        updateList('object');
+    }
+
+    function updateList(type) {
+        const list = document.getElementById(`${type}-list`);
+        list.innerHTML = '';
+
+        filteredAtoms[type].forEach(atom => {
+            const entry = document.createElement('div');
+            entry.className = 'entry';
+            entry.textContent = atom;
+            entry.style.cursor = 'pointer';
+            entry.onclick = () => selectEntry(type, atom);
+            list.appendChild(entry);
         });
-        
-        displayedCount += itemsPerPage;
-        
-        // Hide "Load More" button if all items are displayed
-        document.getElementById('load-more').style.display = 
-            displayedCount >= allAtoms.length ? 'none' : 'block';
     }
 
-    function loadMoreItems() {
-        displayNextBatch();
-    }
-
-    function clearLists() {
-        document.getElementById('subject-list').innerHTML = '';
-        document.getElementById('predicate-list').innerHTML = '';
-        document.getElementById('object-list').innerHTML = '';
-        displayedCount = 0;
+    function selectEntry(type, value) {
+        document.getElementById(`${type}-input`).value = value;
     }
 
     async function addEntry() {
@@ -87,55 +120,49 @@
             try {
                 document.getElementById('add-button').disabled = true;
 
-                const data = {
-                    triple: {
-                        subject_label: subject,
-                        predicate_label: predicate,
-                        object_label: object
-                    }
-                };
-
                 const response = await fetch('/api/v1/graph', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        triple: {
+                            subject_label: subject,
+                            predicate_label: predicate,
+                            object_label: object
+                        }
+                    })
                 });
 
-                const result = await response.json();
-
                 if (response.ok) {
-                    // Recharger la page pour obtenir la liste mise à jour
-                    window.location.reload();
-
-                    // Notifier l'application React
-                    if (graphWindow && !graphWindow.closed) {
-                        graphWindow.postMessage('refreshData', 'http://localhost:3002');
-                        if (graphWindow.refreshGraphData) {
-                            graphWindow.refreshGraphData();
+                    // Ajouter les nouveaux atomes à la liste si nécessaire
+                    [subject, predicate, object].forEach(atom => {
+                        if (!allAtoms.includes(atom)) {
+                            allAtoms.push(atom);
                         }
-                    }
+                    });
+
+                    // Mettre à jour les listes
+                    updateLists();
+
+                    // Effacer les champs
+                    document.getElementById('subject-input').value = '';
+                    document.getElementById('predicate-input').value = '';
+                    document.getElementById('object-input').value = '';
+
+                    showStatus('Triplet créé avec succès!', true);
                 } else {
-                    showStatus(`Erreur lors de l'ajout du triplet: ${result.message}`, false);
+                    const result = await response.json();
+                    showStatus(`Erreur lors de la création du triplet: ${result.error}`, false);
                 }
             } catch (error) {
                 showStatus('Erreur de connexion au serveur', false);
-                console.error('Error:', error);
+                console.error('Erreur:', error);
             } finally {
                 document.getElementById('add-button').disabled = false;
             }
         }
-    }
-
-    function addToList(listId, text) {
-        const list = document.getElementById(listId);
-        const entry = document.createElement('div');
-        entry.className = 'entry';
-        entry.textContent = text;
-        list.appendChild(entry);
     }
 
     function showStatus(message, isSuccess) {
@@ -148,4 +175,4 @@
             status.style.display = 'none';
         }, 3000);
     }
-<% end %>
+</script>
