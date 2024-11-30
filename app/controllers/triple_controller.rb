@@ -1,7 +1,7 @@
-class GraphController < ApplicationController
+class TripleController < ApplicationController
   def index
     @atoms = Atom.all
-     render 'graph/index'
+     render 'triple/index'
   end
 
   def create
