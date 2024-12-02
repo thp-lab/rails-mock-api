@@ -1,41 +1,41 @@
 <div class="container">
     <div class="column">
         <div class="header">Subject</div>
-        <input type="text" id="subject-input" placeholder="Entrez un sujet" oninput="filterList('subject')">
+        <input type="text" id="subject-input" placeholder="Enter a subject" oninput="filterList('subject')">
         <div class="entry-list" id="subject-list"></div>
     </div>
 
     <div class="column">
         <div class="header">Predicate</div>
-        <input type="text" id="predicate-input" placeholder="Entrez un prédicat" oninput="filterList('predicate')">
+        <input type="text" id="predicate-input" placeholder="Enter a predicate" oninput="filterList('predicate')">
         <div class="entry-list" id="predicate-list"></div>
     </div>
 
     <div class="column">
         <div class="header">Object</div>
-        <input type="text" id="object-input" placeholder="Entrez un objet" oninput="filterList('object')">
+        <input type="text" id="object-input" placeholder="Enter a object" oninput="filterList('object')">
         <div class="entry-list" id="object-list"></div>
     </div>
 </div>
 
 <div class="add-button-container">
-    <button id="add-button" onclick="addEntry()">Créer un triplet</button>
+    <button id="add-button" onclick="addEntry()">Create triple</button>
 </div>
 
 <div id="status" class="status"></div>
 
 <div class="triples-table-container">
-    <h2>Triplets</h2>
+    <h2>Triple</h2>
     <div class="search-container">
-        <input type="text" id="triple-search" placeholder="Rechercher dans les triplets..." oninput="filterTriples()">
+        <input type="text" id="triple-search" placeholder="Rechercher dans les triples..." oninput="filterTriples()">
     </div>
     <table id="triples-table">
         <thead>
             <tr>
-                <th>Sujet</th>
-                <th>Prédicat</th>
-                <th>Objet</th>
-                <th>État</th>
+                <th>Subject</th>
+                <th>Predicat</th>
+                <th>Object</th>
+                <th>State</th>
             </tr>
         </thead>
         <tbody id="triples-body">
@@ -43,7 +43,7 @@
                 <td id="preview-subject"></td>
                 <td id="preview-predicate"></td>
                 <td id="preview-object"></td>
-                <td>En cours de saisie</td>
+                <td>Typing in progress</td>
             </tr>
         </tbody>
     </table>
@@ -248,7 +248,7 @@ input[type="text"] {
     function filterTriples() {
         const searchTerm = document.getElementById('triple-search').value.toLowerCase();
         if (searchTerm.length < 1) {
-            // Si la recherche est vide, montrer tous les triplets
+            // Si la recherche est vide, montrer tous les triples
             document.querySelectorAll('#triples-body tr.saved-triple').forEach(row => {
                 row.classList.remove('hidden');
             });
@@ -304,7 +304,7 @@ input[type="text"] {
             });
         }
 
-        // Ajouter les triplets complets comme suggestions
+        // Ajouter les triples complets comme suggestions
         let hasTriples = false;
         allTriples.forEach(triple => {
             const tripleValue = type === 'subject' ? triple.subject.label :
@@ -315,7 +315,7 @@ input[type="text"] {
                 if (!hasTriples) {
                     const divider = document.createElement('div');
                     divider.className = 'section-divider';
-                    divider.textContent = 'Triplets';
+                    divider.textContent = 'triples';
                     list.appendChild(divider);
                     hasTriples = true;
                 }
@@ -328,7 +328,7 @@ input[type="text"] {
                 
                 const preview = document.createElement('div');
                 preview.className = 'triple-preview';
-                preview.textContent = `Triplet: ${triple.subject.label} ${triple.predicate.label} ${triple.object.label}`;
+                preview.textContent = `triple: ${triple.subject.label} ${triple.predicate.label} ${triple.object.label}`;
                 
                 entry.appendChild(mainContent);
                 entry.appendChild(preview);
@@ -374,7 +374,7 @@ input[type="text"] {
             // Extraire tous les atomes uniques
             const atoms = new Set();
             
-            // Stocker les triplets
+            // Stocker les triples
             allTriples = result.data.atoms.filter(item => item.type === 'Triple');
             
             // Ajouter les Atoms simples
@@ -384,7 +384,7 @@ input[type="text"] {
                 }
             });
 
-            // Extraire les atomes des Triplets
+            // Extraire les atomes des triples
             allTriples.forEach(triple => {
                 atoms.add(triple.subject.label);
                 atoms.add(triple.predicate.label);
@@ -401,8 +401,8 @@ input[type="text"] {
             // Mettre à jour le tableau
             updateTriplesTable();
         } catch (error) {
-            console.error('Erreur lors du chargement des atomes:', error);
-            showStatus('Erreur lors du chargement des atomes', false);
+            console.error('Error while loading atoms:', error);
+            showStatus('Error while loading atoms:', false);
         }
     }
 
@@ -414,11 +414,11 @@ input[type="text"] {
                 <td id="preview-subject"></td>
                 <td id="preview-predicate"></td>
                 <td id="preview-object"></td>
-                <td>En cours de saisie</td>
+                <td>Typing in progress</td>
             </tr>
         `;
 
-        // Ajouter les triplets existants
+        // Ajouter les triples existants
         allTriples.forEach(triple => {
             const row = document.createElement('tr');
             row.className = 'saved-triple';
@@ -432,7 +432,7 @@ input[type="text"] {
                 <td>${triple.subject.label}</td>
                 <td>${triple.predicate.label}</td>
                 <td>${triple.object.label}</td>
-                <td>Enregistré</td>
+                <td>Saved</td>
             `;
             tbody.appendChild(row);
         });
@@ -502,14 +502,14 @@ input[type="text"] {
                     document.getElementById('object-input').value = '';
                     updatePreview();
 
-                    showStatus('Triplet créé avec succès!', true);
+                    showStatus('Triple successfully created!', true);
                 } else {
                     const result = await response.json();
-                    showStatus(`Erreur lors de la création du triplet: ${result.error}`, false);
+                    showStatus(`Error while creating the triple: ${result.error}`, false);
                 }
             } catch (error) {
-                showStatus('Erreur de connexion au serveur', false);
-                console.error('Erreur:', error);
+                showStatus('Server connection error', false);
+                console.error('Error:', error);
             } finally {
                 document.getElementById('add-button').disabled = false;
             }
