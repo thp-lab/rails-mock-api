@@ -1,41 +1,41 @@
 <div class="container">
     <div class="column">
-        <div class="header">Sujet</div>
-        <input type="text" id="subject-input" placeholder="Entrez un sujet" oninput="filterList('subject')">
+        <div class="header">Subject</div>
+        <input type="text" id="subject-input" placeholder="Enter a subject" oninput="filterList('subject')">
         <div class="entry-list" id="subject-list"></div>
     </div>
 
     <div class="column">
-        <div class="header">Prédicat</div>
-        <input type="text" id="predicate-input" placeholder="Entrez un prédicat" oninput="filterList('predicate')">
+        <div class="header">Predicate</div>
+        <input type="text" id="predicate-input" placeholder="Enter a predicate" oninput="filterList('predicate')">
         <div class="entry-list" id="predicate-list"></div>
     </div>
 
     <div class="column">
-        <div class="header">Objet</div>
-        <input type="text" id="object-input" placeholder="Entrez un objet" oninput="filterList('object')">
+        <div class="header">Object</div>
+        <input type="text" id="object-input" placeholder="Enter an object" oninput="filterList('object')">
         <div class="entry-list" id="object-list"></div>
     </div>
 </div>
 
 <div class="add-button-container">
-    <button id="add-button" onclick="addEntry()">Créer le triple</button>
+    <button id="add-button" onclick="addEntry()">Create Triple</button>
 </div>
 
 <div id="status" class="status"></div>
 
 <div class="triples-table-container">
-    <h2>Triples existants</h2>
+    <h2>Existing Triples</h2>
     <div class="search-container">
-        <input type="text" id="triple-search" placeholder="Rechercher dans les triples..." oninput="filterTriples()">
+        <input type="text" id="triple-search" placeholder="Search triples..." oninput="filterTriples()">
     </div>
     <table id="triples-table">
         <thead>
             <tr>
-                <th>Sujet</th>
-                <th>Prédicat</th>
-                <th>Objet</th>
-                <th>État</th>
+                <th>Subject</th>
+                <th>Predicate</th>
+                <th>Object</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody id="triples-body">
@@ -43,7 +43,7 @@
                 <td id="preview-subject"></td>
                 <td id="preview-predicate"></td>
                 <td id="preview-object"></td>
-                <td>En cours de saisie</td>
+                <td>Being entered</td>
             </tr>
         </tbody>
     </table>
@@ -264,7 +264,7 @@ input[type="text"] {
         object: []
     };
 
-    // Charger tous les atomes au démarrage
+    // Load all atoms on startup
     window.addEventListener('load', loadAtoms);
 
     function filterTriples() {
@@ -300,10 +300,10 @@ input[type="text"] {
         const list = document.getElementById(`${type}-list`);
         list.innerHTML = '';
 
-        // Ajouter d'abord les triples complets comme suggestions
+        // Add complete triples as suggestions first
         const triplesSection = document.createElement('div');
         triplesSection.className = 'section-divider';
-        triplesSection.textContent = 'Triples complets';
+        triplesSection.textContent = 'Complete Triples';
         list.appendChild(triplesSection);
 
         const matchingTriples = allTriples.filter(triple => {
@@ -316,7 +316,7 @@ input[type="text"] {
             const entry = document.createElement('div');
             entry.className = 'entry triple';
             entry.innerHTML = `
-                <div>Utiliser le triple complet :</div>
+                <div>Use complete triple:</div>
                 <div class="triple-value">${tripleString}</div>
             `;
             entry.onclick = () => {
@@ -326,13 +326,13 @@ input[type="text"] {
             list.appendChild(entry);
         });
 
-        // Ajouter ensuite les atomes individuels
+        // Then add individual atoms
         const atomsSection = document.createElement('div');
         atomsSection.className = 'section-divider';
-        atomsSection.textContent = 'Atomes individuels';
+        atomsSection.textContent = 'Individual Atoms';
         list.appendChild(atomsSection);
 
-        // Créer un Set pour stocker toutes les valeurs uniques
+        // Create a Set to store all unique values
         const uniqueValues = new Set([...allAtoms]);
         allTriples.forEach(triple => {
             uniqueValues.add(triple.subject.label);
@@ -340,7 +340,7 @@ input[type="text"] {
             uniqueValues.add(triple.object.label);
         });
 
-        // Filtrer et afficher les atomes individuels
+        // Filter and display individual atoms
         Array.from(uniqueValues)
             .filter(value => value.toLowerCase().includes(searchTerm))
             .forEach(value => {
@@ -351,7 +351,7 @@ input[type="text"] {
                 list.appendChild(entry);
             });
 
-        // Mettre à jour la prévisualisation
+        // Update preview
         updatePreview();
     }
 
@@ -364,7 +364,7 @@ input[type="text"] {
         document.getElementById('preview-predicate').textContent = predicate;
         document.getElementById('preview-object').textContent = object;
 
-        // Afficher ou masquer la ligne de prévisualisation
+        // Show or hide preview row
         const previewRow = document.getElementById('preview-row');
         if (subject || predicate || object) {
             previewRow.style.display = '';
@@ -378,20 +378,20 @@ input[type="text"] {
             const response = await fetch('/api/v1/graph');
             const result = await response.json();
             
-            // Extraire tous les atomes uniques
+            // Extract all unique atoms
             const atoms = new Set();
             
-            // Stocker les triples
+            // Store triples
             allTriples = result.data.atoms.filter(item => item.type === 'Triple');
             
-            // Ajouter les Atoms simples
+            // Add simple Atoms
             result.data.atoms.forEach(item => {
                 if (item.type === 'Atom') {
                     atoms.add(item.label);
                 }
             });
 
-            // Extraire les atomes des triples
+            // Extract atoms from triples
             allTriples.forEach(triple => {
                 atoms.add(triple.subject.label);
                 atoms.add(triple.predicate.label);
@@ -400,39 +400,39 @@ input[type="text"] {
 
             allAtoms = Array.from(atoms);
             
-            // Initialiser les listes
+            // Initialize lists
             filterList('subject');
             filterList('predicate');
             filterList('object');
             
-            // Mettre à jour le tableau
+            // Update table
             updateTriplesTable();
         } catch (error) {
-            console.error('Erreur lors du chargement des atomes:', error);
-            showStatus('Erreur lors du chargement des atomes', false);
+            console.error('Error loading atoms:', error);
+            showStatus('Error loading atoms', false);
         }
     }
 
     function updateTriplesTable() {
         const tbody = document.getElementById('triples-body');
-        // Garder seulement la ligne de prévisualisation
+        // Keep only preview row
         tbody.innerHTML = `
             <tr id="preview-row" class="preview-row">
                 <td id="preview-subject"></td>
                 <td id="preview-predicate"></td>
                 <td id="preview-object"></td>
-                <td>En cours de saisie</td>
+                <td>Being entered</td>
             </tr>
         `;
 
-        // Ajouter les triples existants
+        // Add existing triples
         allTriples.forEach(triple => {
             const row = document.createElement('tr');
             row.className = 'saved-triple';
             
             const tripleString = createTripleString(triple);
             
-            // Créer les cellules individuellement
+            // Create cells individually
             const subjectCell = document.createElement('td');
             subjectCell.textContent = triple.subject.label;
             subjectCell.onclick = () => selectEntry('subject', tripleString);
@@ -446,7 +446,7 @@ input[type="text"] {
             objectCell.onclick = () => selectEntry('object', tripleString);
 
             const stateCell = document.createElement('td');
-            stateCell.textContent = 'Enregistré';
+            stateCell.textContent = 'Saved';
 
             row.appendChild(subjectCell);
             row.appendChild(predicateCell);
@@ -456,7 +456,7 @@ input[type="text"] {
             tbody.appendChild(row);
         });
 
-        // Restaurer la prévisualisation si nécessaire
+        // Restore preview if needed
         updatePreview();
     }
 
@@ -492,10 +492,10 @@ input[type="text"] {
                 if (response.ok) {
                     const result = await response.json();
                     
-                    // Mettre à jour les données avec la réponse du serveur
+                    // Update data with server response
                     allTriples = result.data.atoms.filter(item => item.type === 'Triple');
                     
-                    // Mettre à jour les atomes
+                    // Update atoms
                     const atoms = new Set();
                     result.data.atoms.forEach(item => {
                         if (item.type === 'Atom') {
@@ -509,26 +509,26 @@ input[type="text"] {
                     });
                     allAtoms = Array.from(atoms);
 
-                    // Mettre à jour l'interface
+                    // Update interface
                     updateTriplesTable();
                     filterList('subject');
                     filterList('predicate');
                     filterList('object');
 
-                    // Effacer les champs
+                    // Clear fields
                     document.getElementById('subject-input').value = '';
                     document.getElementById('predicate-input').value = '';
                     document.getElementById('object-input').value = '';
                     updatePreview();
 
-                    showStatus('Triple créé avec succès !', true);
+                    showStatus('Triple created successfully!', true);
                 } else {
                     const result = await response.json();
-                    showStatus(`Erreur lors de la création du triple : ${result.error}`, false);
+                    showStatus(`Error creating triple: ${result.error}`, false);
                 }
             } catch (error) {
-                showStatus('Erreur de connexion au serveur', false);
-                console.error('Erreur:', error);
+                showStatus('Server connection error', false);
+                console.error('Error:', error);
             } finally {
                 document.getElementById('add-button').disabled = false;
             }
