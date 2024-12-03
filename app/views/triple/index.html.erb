@@ -1,41 +1,41 @@
 <div class="container">
     <div class="column">
-        <div class="header">Subject</div>
-        <input type="text" id="subject-input" placeholder="Enter a subject" oninput="filterList('subject')">
+        <div class="header">Sujet</div>
+        <input type="text" id="subject-input" placeholder="Entrez un sujet" oninput="filterList('subject')">
         <div class="entry-list" id="subject-list"></div>
     </div>
 
     <div class="column">
-        <div class="header">Predicate</div>
-        <input type="text" id="predicate-input" placeholder="Enter a predicate" oninput="filterList('predicate')">
+        <div class="header">Prédicat</div>
+        <input type="text" id="predicate-input" placeholder="Entrez un prédicat" oninput="filterList('predicate')">
         <div class="entry-list" id="predicate-list"></div>
     </div>
 
     <div class="column">
-        <div class="header">Object</div>
-        <input type="text" id="object-input" placeholder="Enter a object" oninput="filterList('object')">
+        <div class="header">Objet</div>
+        <input type="text" id="object-input" placeholder="Entrez un objet" oninput="filterList('object')">
         <div class="entry-list" id="object-list"></div>
     </div>
 </div>
 
 <div class="add-button-container">
-    <button id="add-button" onclick="addEntry()">Create triple</button>
+    <button id="add-button" onclick="addEntry()">Créer le triple</button>
 </div>
 
 <div id="status" class="status"></div>
 
 <div class="triples-table-container">
-    <h2>Triple</h2>
+    <h2>Triples existants</h2>
     <div class="search-container">
         <input type="text" id="triple-search" placeholder="Rechercher dans les triples..." oninput="filterTriples()">
     </div>
     <table id="triples-table">
         <thead>
             <tr>
-                <th>Subject</th>
-                <th>Predicat</th>
-                <th>Object</th>
-                <th>State</th>
+                <th>Sujet</th>
+                <th>Prédicat</th>
+                <th>Objet</th>
+                <th>État</th>
             </tr>
         </thead>
         <tbody id="triples-body">
@@ -43,7 +43,7 @@
                 <td id="preview-subject"></td>
                 <td id="preview-predicate"></td>
                 <td id="preview-object"></td>
-                <td>Typing in progress</td>
+                <td>En cours de saisie</td>
             </tr>
         </tbody>
     </table>
@@ -75,15 +75,16 @@ input[type="text"] {
 }
 
 .entry-list {
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
     border: 1px solid #ddd;
     margin-top: 5px;
 }
 
 .entry {
-    padding: 5px;
+    padding: 8px;
     cursor: pointer;
+    border-bottom: 1px solid #eee;
 }
 
 .entry:hover {
@@ -170,8 +171,9 @@ input[type="text"] {
     color: #4caf50;
 }
 
-.saved-triple {
+.saved-triple td {
     cursor: pointer;
+    position: relative;
 }
 
 .saved-triple:hover {
@@ -185,9 +187,9 @@ input[type="text"] {
 
 .entry.triple {
     background-color: #f1f8e9;
-    border-bottom: 1px solid #ddd;
-    padding: 8px 5px;
+    padding: 10px;
     margin-top: 5px;
+    border-radius: 4px;
 }
 
 .entry.triple:hover {
@@ -201,7 +203,7 @@ input[type="text"] {
 }
 
 .section-divider {
-    padding: 5px;
+    padding: 8px;
     background-color: #f5f5f5;
     font-weight: bold;
     color: #666;
@@ -231,6 +233,26 @@ input[type="text"] {
     color: #a94442;
     border: 1px solid #ebccd1;
 }
+
+.triple-value {
+    background-color: #e3f2fd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.triple-suggestion {
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.triple-suggestion:hover {
+    background-color: #e9ecef;
+}
 </style>
 
 <script>
@@ -248,7 +270,6 @@ input[type="text"] {
     function filterTriples() {
         const searchTerm = document.getElementById('triple-search').value.toLowerCase();
         if (searchTerm.length < 1) {
-            // Si la recherche est vide, montrer tous les triples
             document.querySelectorAll('#triples-body tr.saved-triple').forEach(row => {
                 row.classList.remove('hidden');
             });
@@ -263,11 +284,14 @@ input[type="text"] {
             const object = row.children[2].textContent.toLowerCase();
             const fullText = `${subject} ${predicate} ${object}`;
             
-            // Recherche plus souple : vérifie si le terme de recherche est contenu dans n'importe quelle partie
             const matches = fullText.includes(searchTerm);
             
             row.classList.toggle('hidden', !matches);
         });
+    }
+
+    function createTripleString(triple) {
+        return `${triple.subject.label} ${triple.predicate.label} ${triple.object.label}`;
     }
 
     function filterList(type) {
@@ -275,6 +299,38 @@ input[type="text"] {
         const searchTerm = input.value.toLowerCase();
         const list = document.getElementById(`${type}-list`);
         list.innerHTML = '';
+
+        // Ajouter d'abord les triples complets comme suggestions
+        const triplesSection = document.createElement('div');
+        triplesSection.className = 'section-divider';
+        triplesSection.textContent = 'Triples complets';
+        list.appendChild(triplesSection);
+
+        const matchingTriples = allTriples.filter(triple => {
+            const tripleString = createTripleString(triple).toLowerCase();
+            return tripleString.includes(searchTerm);
+        });
+
+        matchingTriples.forEach(triple => {
+            const tripleString = createTripleString(triple);
+            const entry = document.createElement('div');
+            entry.className = 'entry triple';
+            entry.innerHTML = `
+                <div>Utiliser le triple complet :</div>
+                <div class="triple-value">${tripleString}</div>
+            `;
+            entry.onclick = () => {
+                document.getElementById(`${type}-input`).value = tripleString;
+                updatePreview();
+            };
+            list.appendChild(entry);
+        });
+
+        // Ajouter ensuite les atomes individuels
+        const atomsSection = document.createElement('div');
+        atomsSection.className = 'section-divider';
+        atomsSection.textContent = 'Atomes individuels';
+        list.appendChild(atomsSection);
 
         // Créer un Set pour stocker toutes les valeurs uniques
         const uniqueValues = new Set([...allAtoms]);
@@ -284,65 +340,16 @@ input[type="text"] {
             uniqueValues.add(triple.object.label);
         });
 
-        // Convertir en tableau et filtrer selon le terme de recherche
-        const filteredValues = Array.from(uniqueValues)
-            .filter(value => value.toLowerCase().includes(searchTerm));
-
-        // Ajouter les valeurs filtrées
-        if (filteredValues.length > 0) {
-            const divider = document.createElement('div');
-            divider.className = 'section-divider';
-            divider.textContent = 'Valeurs disponibles';
-            list.appendChild(divider);
-
-            filteredValues.forEach(value => {
+        // Filtrer et afficher les atomes individuels
+        Array.from(uniqueValues)
+            .filter(value => value.toLowerCase().includes(searchTerm))
+            .forEach(value => {
                 const entry = document.createElement('div');
                 entry.className = 'entry';
                 entry.textContent = value;
                 entry.onclick = () => selectEntry(type, value);
                 list.appendChild(entry);
             });
-        }
-
-        // Ajouter les triples complets comme suggestions
-        let hasTriples = false;
-        allTriples.forEach(triple => {
-            const tripleValue = type === 'subject' ? triple.subject.label :
-                              type === 'predicate' ? triple.predicate.label :
-                              triple.object.label;
-            
-            if (tripleValue.toLowerCase().includes(searchTerm)) {
-                if (!hasTriples) {
-                    const divider = document.createElement('div');
-                    divider.className = 'section-divider';
-                    divider.textContent = 'triples';
-                    list.appendChild(divider);
-                    hasTriples = true;
-                }
-
-                const entry = document.createElement('div');
-                entry.className = 'entry triple';
-                
-                const mainContent = document.createElement('div');
-                mainContent.textContent = tripleValue;
-                
-                const preview = document.createElement('div');
-                preview.className = 'triple-preview';
-                preview.textContent = `triple: ${triple.subject.label} ${triple.predicate.label} ${triple.object.label}`;
-                
-                entry.appendChild(mainContent);
-                entry.appendChild(preview);
-                
-                entry.onclick = () => {
-                    document.getElementById('subject-input').value = triple.subject.label;
-                    document.getElementById('predicate-input').value = triple.predicate.label;
-                    document.getElementById('object-input').value = triple.object.label;
-                    updatePreview();
-                };
-                
-                list.appendChild(entry);
-            }
-        });
 
         // Mettre à jour la prévisualisation
         updatePreview();
@@ -401,8 +408,8 @@ input[type="text"] {
             // Mettre à jour le tableau
             updateTriplesTable();
         } catch (error) {
-            console.error('Error while loading atoms:', error);
-            showStatus('Error while loading atoms:', false);
+            console.error('Erreur lors du chargement des atomes:', error);
+            showStatus('Erreur lors du chargement des atomes', false);
         }
     }
 
@@ -414,7 +421,7 @@ input[type="text"] {
                 <td id="preview-subject"></td>
                 <td id="preview-predicate"></td>
                 <td id="preview-object"></td>
-                <td>Typing in progress</td>
+                <td>En cours de saisie</td>
             </tr>
         `;
 
@@ -422,18 +429,30 @@ input[type="text"] {
         allTriples.forEach(triple => {
             const row = document.createElement('tr');
             row.className = 'saved-triple';
-            row.onclick = () => {
-                document.getElementById('subject-input').value = triple.subject.label;
-                document.getElementById('predicate-input').value = triple.predicate.label;
-                document.getElementById('object-input').value = triple.object.label;
-                updatePreview();
-            };
-            row.innerHTML = `
-                <td>${triple.subject.label}</td>
-                <td>${triple.predicate.label}</td>
-                <td>${triple.object.label}</td>
-                <td>Saved</td>
-            `;
+            
+            const tripleString = createTripleString(triple);
+            
+            // Créer les cellules individuellement
+            const subjectCell = document.createElement('td');
+            subjectCell.textContent = triple.subject.label;
+            subjectCell.onclick = () => selectEntry('subject', tripleString);
+
+            const predicateCell = document.createElement('td');
+            predicateCell.textContent = triple.predicate.label;
+            predicateCell.onclick = () => selectEntry('predicate', tripleString);
+
+            const objectCell = document.createElement('td');
+            objectCell.textContent = triple.object.label;
+            objectCell.onclick = () => selectEntry('object', tripleString);
+
+            const stateCell = document.createElement('td');
+            stateCell.textContent = 'Enregistré';
+
+            row.appendChild(subjectCell);
+            row.appendChild(predicateCell);
+            row.appendChild(objectCell);
+            row.appendChild(stateCell);
+            
             tbody.appendChild(row);
         });
 
@@ -502,14 +521,14 @@ input[type="text"] {
                     document.getElementById('object-input').value = '';
                     updatePreview();
 
-                    showStatus('Triple successfully created!', true);
+                    showStatus('Triple créé avec succès !', true);
                 } else {
                     const result = await response.json();
-                    showStatus(`Error while creating the triple: ${result.error}`, false);
+                    showStatus(`Erreur lors de la création du triple : ${result.error}`, false);
                 }
             } catch (error) {
-                showStatus('Server connection error', false);
-                console.error('Error:', error);
+                showStatus('Erreur de connexion au serveur', false);
+                console.error('Erreur:', error);
             } finally {
                 document.getElementById('add-button').disabled = false;
             }
