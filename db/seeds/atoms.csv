@@ -1,0 +1,11 @@
+@context,@type,name,url,description,image
+https://schema.org,Organization,Harvard University,https://www.harvard.edu,"One of the world's most prestigious universities, offering comprehensive education programs.",https://harvard.edu/logo.jpg
+https://schema.org,Organization,MIT,https://www.mit.edu,"Leading research institution specializing in science and technology.",https://mit.edu/logo.jpg
+https://schema.org,Person,Professor Smith,https://faculty.edu/smith,"Distinguished professor of Computer Science with 15 years of teaching experience.",https://faculty.edu/smith/photo.jpg
+https://schema.org,Person,Professor Johnson,https://faculty.edu/johnson,"Expert in Artificial Intelligence and Machine Learning.",https://faculty.edu/johnson/photo.jpg
+https://schema.org,Course,Computer Science 101,https://courses.edu/cs101,"Introduction to programming concepts and algorithms.",https://courses.edu/cs101/banner.jpg
+https://schema.org,Course,Data Science Fundamentals,https://courses.edu/data101,"Basic principles of data analysis and visualization.",https://courses.edu/data101/banner.jpg
+https://schema.org,Event,Tech Conference 2024,https://conf.edu/tech2024,"Annual technology conference featuring industry experts.",https://conf.edu/tech2024/poster.jpg
+https://schema.org,Place,Main Campus Library,https://campus.edu/library,"Central research facility with extensive digital and print resources.",https://campus.edu/library/building.jpg
+https://schema.org,Product,Student Portal,https://portal.edu,"Online platform for course management and student resources.",https://portal.edu/interface.jpg
+https://schema.org,CreativeWork,Research Paper Template,https://resources.edu/template,"Standardized format for academic research papers.",https://resources.edu/template/preview.jpg
