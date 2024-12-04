@@ -10,18 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 1) do
+ActiveRecord::Schema[8.0].define(version: 2024_01_12_000000) do
   create_table "atoms", primary_key: "label", id: :string, force: :cascade do |t|
     t.string "creator_label", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "metadata", default: {}, null: false
     t.index ["creator_label"], name: "index_atoms_on_creator_label"
+    t.index ["metadata"], name: "index_atoms_on_metadata"
   end
 
   create_table "creators", primary_key: "label", id: :string, force: :cascade do |t|
     t.string "image", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "persons", id: false, force: :cascade do |t|
+    t.string "label", null: false
+    t.string "name"
+    t.string "url"
+    t.text "description"
+    t.string "image"
+    t.string "context"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["label"], name: "index_persons_on_label", unique: true
   end
 
   create_table "triples", id: :string, force: :cascade do |t|
