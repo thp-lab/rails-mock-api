@@ -35,6 +35,12 @@ class Triple < ApplicationRecord
   def get_component_label(type, id)
     return id unless type.present?
     
+    # Handle Triple type separately since it uses 'id' instead of 'label'
+    if type == "Triple"
+      triple = Triple.find_by(id: id)
+      return triple&.id || id
+    end
+    
     # Try to find the component in Atom table first
     atom = Atom.find_by(label: id)
     return atom.label if atom.present?
