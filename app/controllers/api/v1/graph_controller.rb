@@ -1,6 +1,42 @@
 class Api::V1::GraphController < Api::BaseController
   def index
-    render_graph_data
+    triples = Triple.includes(:subject, :predicate, :object, :creator).map do |triple|
+      {
+        id: triple.id,
+        label: triple.label,
+        type: 'Triple',
+        subject: {
+          id: triple.subject.label,
+          label: triple.subject.label,
+          type: triple.subject_type
+        },
+        predicate: {
+          id: triple.predicate.label,
+          label: triple.predicate.label,
+          type: triple.predicate_type
+        },
+        object: {
+          id: triple.object.label,
+          label: triple.object.label,
+          type: triple.object_type
+        },
+        creator: triple.creator.label
+      }
+    end
+
+    atoms = Atom.includes(:creator).map do |atom|
+      {
+        id: atom.label,
+        label: atom.label,
+        type: 'Atom'
+      }
+    end
+
+    render json: {
+      data: {
+        atoms: atoms + triples
+      }
+    }
   end
 
   def create
@@ -72,7 +108,11 @@ class Api::V1::GraphController < Api::BaseController
         creator: creator
       )
 
-      render_graph_data
+      render json: {
+        data: {
+          triple: triple
+        }
+      }
     rescue ActiveRecord::RecordInvalid => e
       render json: { error: "Erreur de validation: #{e.message}" }, status: :unprocessable_entity
     rescue StandardError => e
@@ -82,45 +122,5 @@ class Api::V1::GraphController < Api::BaseController
 
   def triple_params
     params.require(:triple).permit(:subject_label, :predicate_label, :object_label)
-  end
-
-  def render_graph_data
-    triples = Triple.includes(:subject, :predicate, :object, :creator).map do |triple|
-      {
-        id: triple.id,
-        label: triple.label,
-        type: 'Triple',
-        subject: {
-          id: triple.subject.label,
-          label: triple.subject.label,
-          type: triple.subject_type
-        },
-        predicate: {
-          id: triple.predicate.label,
-          label: triple.predicate.label,
-          type: triple.predicate_type
-        },
-        object: {
-          id: triple.object.label,
-          label: triple.object.label,
-          type: triple.object_type
-        },
-        creator: triple.creator.label
-      }
-    end
-
-    atoms = Atom.includes(:creator).map do |atom|
-      {
-        id: atom.label,
-        label: atom.label,
-        type: 'Atom'
-      }
-    end
-
-    render json: {
-      data: {
-        atoms: atoms + triples
-      }
-    }
   end
 end
