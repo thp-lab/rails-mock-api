@@ -9,4 +9,7 @@ class Atom < ApplicationRecord
   has_many :asObject, as: :object, class_name: "Triple"
 
   validates :label, presence: true
+  
+  # Store schema.org metadata as JSON
+  store_accessor :metadata, :@context, :@type, :url, :description, :image
 end
