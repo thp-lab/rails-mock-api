@@ -4,11 +4,39 @@ class TripleController < ApplicationController
   end
 
   def create
-    triple = Triple.new(triple_params)
-    if triple.save
+    begin
+      creator = Creator.find_or_create_by!(
+        label: 'The Hacking Project',
+        image: 'thp_logo.png'
+      )
+
+      subject = Atom.where(label: triple_params[:subject_label]).first_or_initialize.tap do |atom|
+        atom.creator = creator
+        atom.save!
+      end
+
+      predicate = Atom.where(label: triple_params[:predicate_label]).first_or_initialize.tap do |atom|
+        atom.creator = creator
+        atom.save!
+      end
+
+      object = Atom.where(label: triple_params[:object_label]).first_or_initialize.tap do |atom|
+        atom.creator = creator
+        atom.save!
+      end
+
+      triple = Triple.create!(
+        subject: subject,
+        predicate: predicate,
+        object: object,
+        creator: creator
+      )
+
       render json: { data: { triple: triple } }, status: :created
-    else
-      render json: { error: triple.errors.full_messages }, status: :unprocessable_entity
+    rescue ActiveRecord::RecordInvalid => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    rescue StandardError => e
+      render json: { error: e.message }, status: :internal_server_error
     end
   end
 

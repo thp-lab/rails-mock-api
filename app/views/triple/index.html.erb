@@ -29,7 +29,7 @@
 
 <div class="add-button-container">
     <button id="add-button" onclick="addEntry()">Create Triple</button>
-    <button id="download-csv">Download CSV</button>
+    <button id="export-csv">Download CSV</button>
 </div>
 
 <div id="status" class="status"></div>
@@ -60,7 +60,6 @@
 </div>
 
 <%= javascript_include_tag 'export_csv' %>
-
 
 <script>
     let allAtoms = [];
@@ -281,11 +280,12 @@
             try {
                 document.getElementById('add-button').disabled = true;
 
-                const response = await fetch('/api/v1/graph', {
+                const response = await fetch('/triple', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
                     },
                     body: JSON.stringify({
                         triple: {
@@ -297,30 +297,8 @@
                 });
 
                 if (response.ok) {
-                    const result = await response.json();
-                    
-                    // Update data with server response
-                    allTriples = result.data.atoms.filter(item => item.type === 'Triple');
-                    
-                    // Update atoms
-                    const atoms = new Set();
-                    result.data.atoms.forEach(item => {
-                        if (item.type === 'Atom') {
-                            atoms.add(item.label);
-                        }
-                    });
-                    allTriples.forEach(triple => {
-                        atoms.add(triple.subject.label);
-                        atoms.add(triple.predicate.label);
-                        atoms.add(triple.object.label);
-                    });
-                    allAtoms = Array.from(atoms);
-
-                    // Update interface
-                    updateTriplesTable();
-                    filterList('subject');
-                    filterList('predicate');
-                    filterList('object');
+                    // Recharger les données après la création
+                    await loadAtoms();
 
                     // Clear fields
                     document.getElementById('subject-input').value = '';
