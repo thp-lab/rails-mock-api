@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the file download
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'data.csv';
+        link.download = 'export.zip';  // Changed to .zip since we're downloading a ZIP file
         link.click();
 
         // Clean up
