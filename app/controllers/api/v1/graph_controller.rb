@@ -54,7 +54,7 @@ class Api::V1::GraphController < Api::BaseController
   def handle_graphql_request
     query = JSON.parse(request.raw_post)['query']
     if query.include?('triples')
-      triples_data = Triple.includes(:subject, :predicate, :object).limit(500).map do |triple|
+      triples_data = Triple.includes(:subject, :predicate, :object).map do |triple|
         {
           id: triple.id,
           subject: {

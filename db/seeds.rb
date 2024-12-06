@@ -1,5 +1,5 @@
 # Liste des options disponibles
-options = ["smallNestedGraph", "BigFlatGraph", "Empty ( I'll generate the data myself from the triples creation view ) "]
+options = ["smallNestedGraph", "BigFlatGraph", "Empty ( I'll generate the data myself from the triples creation view )", "Stress test"]
 
 # Si SEED_OPTION est défini, utiliser cette valeur
 if ENV['SEED_OPTION']
@@ -18,8 +18,14 @@ end
 if choice&.between?(1, options.length)
   selected_option = options[choice - 1]
 
-  if selected_option == options[2]
+  case selected_option
+  when options[2]
     puts "Creating empty database structure..."
+  when options[3]
+    # Inclure le stress_test.rb
+    stress_test_file = File.join(__dir__, 'stress_test.rb')
+    puts "Running stress test seed from #{stress_test_file}..."
+    load stress_test_file
   else
     seed_file = File.join(__dir__, 'seeds', 'school', selected_option, 'seed.rb')
     puts "Running #{seed_file}..."
