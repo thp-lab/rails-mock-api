@@ -103,3 +103,37 @@ button:disabled {
 .add-button-container {
     text-align: center;
 }
+
+body.dark-mode {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+body.dark-mode .header {
+    background-color: #333;
+    color: #f0f0f0;
+}
+
+body.dark-mode input {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #666;
+}
+
+body.dark-mode button {
+    background-color: #555;
+    color: #fff;
+    border: 1px solid #777;
+}
+
+body.dark-mode .triples-table-container {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+/* Ajoutez des styles spécifiques pour vos graphiques si nécessaires */
+body.dark-mode .graph {
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+    color: #f9f9f9;
+}
