@@ -1,33 +1,18 @@
 require 'csv'
-require 'zip'
 
 class ExportController < ApplicationController
   def csv
-    # Crée un fichier ZIP temporaire contenant les deux CSV
-    temp_file = Tempfile.new('export.zip')
-    
-    begin
-      Zip::OutputStream.open(temp_file) { |zos| }  # Initialise le ZIP
-      
-      Zip::File.open(temp_file.path, Zip::File::CREATE) do |zipfile|
-        # Ajoute le fichier atoms.csv
-        zipfile.get_output_stream("atoms.csv") do |f|
-          f.write(generate_atoms_csv)
-        end
-        
-        # Ajoute le fichier triples.csv
-        zipfile.get_output_stream("triples.csv") do |f|
-          f.write(generate_triples_csv)
-        end
-      end
-      
-      # Envoie le fichier ZIP
-      zip_data = File.read(temp_file.path)
-      send_data(zip_data, filename: "export.zip", type: 'application/zip')
-    ensure
-      temp_file.close
-      temp_file.unlink
+    # Détermine quel fichier CSV doit être généré en fonction du paramètre
+    if params[:type] == 'atoms'
+      csv_data = generate_atoms_csv
+      filename = 'atoms.csv'
+    else
+      csv_data = generate_triples_csv
+      filename = 'triples.csv'
     end
+    
+    # Envoie le fichier CSV directement
+    send_data(csv_data, filename: filename, type: 'text/csv')
   end
 
   private
