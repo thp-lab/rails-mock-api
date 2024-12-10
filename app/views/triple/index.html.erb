@@ -31,6 +31,7 @@
     <button id="add-button" onclick="addEntry()">Create Triple</button>
     <button id="export-csv">Download CSV</button>
     <button onclick="window.location.href='/api/v1/graph'">View JSON</button>
+    <button onclick="toggleTheme()">Toggle Dark Mode</button>
 </div>
 
 <div id="status" class="status"></div>
@@ -61,6 +62,7 @@
 </div>
 
 <%= javascript_include_tag 'export_csv' %>
+<%= javascript_include_tag 'darkmode'%>
 
 <script>
     let allAtoms = [];

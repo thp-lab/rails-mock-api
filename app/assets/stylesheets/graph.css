@@ -103,3 +103,43 @@ button:disabled {
 .add-button-container {
     text-align: center;
 }
+
+/* Dark mode adjustments */
+body.dark-mode .container {
+    background-color: #1e1e1e; /* Fond sombre */
+    color: #f5f5f5; /* Texte clair */
+}
+
+body.dark-mode .entry-list {
+    background-color: #2e2e2e; /* Liste des entrées */
+    border: 1px solid #444; /* Bordure sombre */
+    color: #ddd;
+}
+
+body.dark-mode .entry {
+    background-color: #2e2e2e;
+    border-bottom: 1px solid #444;
+}
+
+body.dark-mode .entry:hover {
+    background-color: #444;
+}
+
+body.dark-mode button {
+    background-color: #444;
+    color: #ddd;
+}
+
+body.dark-mode button:hover {
+    background-color: #555;
+}
+
+body.dark-mode .success {
+    background-color: #264d26; /* Fond vert sombre */
+    color: #a1dca1; /* Texte vert clair */
+}
+
+body.dark-mode .error {
+    background-color: #5b2c2c; /* Fond rouge sombre */
+    color: #f5a1a1; /* Texte rouge clair */
+}
