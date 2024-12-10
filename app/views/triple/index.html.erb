@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Triples Management</title>
-<link rel="stylesheet" href="<%= asset_path('styles.css') %>">
+    <link rel="stylesheet" href="<%= asset_path('styles.css') %>">
 </head>
+<body>
+<!-- Integration Banner -->
+<div class="integration-banner" id="integration-banner">
+    Welcome to the Triples Management Interface! This application allows you to easily manage your data.
+    <button class="close-button" onclick="closeBanner()">×</button>
+</div>
 
 <div class="container">
     <div class="column">
@@ -71,8 +77,29 @@
         object: []
     };
 
-    // Load all atoms on startup
-    window.addEventListener('load', loadAtoms);
+    // Banner management
+    function showBanner() {
+        const banner = document.getElementById('integration-banner');
+        document.body.classList.add('banner-shown');
+        banner.classList.add('show');
+    }
+
+    function closeBanner() {
+        const banner = document.getElementById('integration-banner');
+        document.body.classList.remove('banner-shown');
+        banner.classList.remove('show');
+        
+        // Store in localStorage that the banner has been closed
+        localStorage.setItem('bannerClosed', 'true');
+    }
+
+    // Show banner on page load if it hasn't been closed before
+    window.addEventListener('load', () => {
+        if (!localStorage.getItem('bannerClosed')) {
+            setTimeout(showBanner, 500); // Show banner after a small delay
+        }
+        loadAtoms();
+    });
 
     function filterTriples() {
         const searchTerm = document.getElementById('triple-search').value.toLowerCase();
@@ -298,7 +325,7 @@
                 });
 
                 if (response.ok) {
-                    // Recharger les données après la création
+                    // Reload data after creation
                     await loadAtoms();
 
                     // Clear fields
@@ -332,3 +359,5 @@
         }, 3000);
     }
 </script>
+</body>
+</html>
