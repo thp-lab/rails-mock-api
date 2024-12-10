@@ -201,3 +201,37 @@ input[type="text"] {
 .triple-suggestion:hover {
   background-color: #e9ecef;
 }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode */
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Light mode */
+body.light-mode {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Example for other elements */
+.header {
+  font-size: 1.5rem;
+  padding: 10px;
+}
+
+body.dark-mode .header {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+body.light-mode .header {
+  background-color: #f5f5f5;
+  color: #000000;
+}
