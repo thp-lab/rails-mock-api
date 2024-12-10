@@ -116,7 +116,7 @@ input[type="text"] {
 }
 
 .saved-triple td:last-child {
-  color: #4caf50;
+  color: #e11f1f;
 }
 
 .saved-triple td {
@@ -273,11 +273,11 @@ body.dark-mode .preview-row {
 }
 
 body.dark-mode .saved-triple {
-  background-color: #223322; /* Fond vert foncé */
+  background-color: #427542; /* Fond vert foncé */
 }
 
 body.dark-mode .saved-triple td:last-child {
-  color: #80ff80; /* Texte vert clair */
+  color: #39b5d1; /* Texte vert clair */
 }
 
 body.dark-mode .saved-triple:hover {
