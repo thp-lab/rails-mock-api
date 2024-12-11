@@ -1,8 +1,54 @@
+.show-banner-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    color: #1b2333;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+    z-index: 1000;
+}
+
+.show-banner-button:hover {
+    color: #60a5fa;
+}
+
+.show-banner-button i {
+    font-size: 0.8rem;
+}
+
 .join-banner {
     background-color: #1b2333;
     padding: 3rem;
     margin: 2rem;
     border-radius: 24px;
+    color: white;
+    position: relative;
+}
+
+.banner-close {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    color: #a1a7b3;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.banner-close:hover {
     color: white;
 }
 
