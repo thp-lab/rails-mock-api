@@ -1,5 +1,5 @@
 # Liste des options disponibles
-options = %w[smallNestedGraph BigFlatGraph CSVPopulator]
+options = ["smallNestedGraph", "BigFlatGraph", "Empty ( I'll generate the data myself from the triples creation view ) "]
 
 # Si SEED_OPTION est défini, utiliser cette valeur
 if ENV['SEED_OPTION']
@@ -17,9 +17,14 @@ end
 # Vérifie le choix et exécute la seed correspondante
 if choice&.between?(1, options.length)
   selected_option = options[choice - 1]
-  seed_file = File.join(__dir__, 'seeds', 'school', selected_option, 'seed.rb')
-  puts "Running #{seed_file}..."
-  load seed_file
+
+  if selected_option == options[2]
+    puts "Creating empty database structure..."
+  else
+    seed_file = File.join(__dir__, 'seeds', 'school', selected_option, 'seed.rb')
+    puts "Running #{seed_file}..."
+    load seed_file
+  end
 else
   puts "Invalid choice. Exiting."
 end

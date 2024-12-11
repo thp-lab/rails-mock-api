@@ -1,30 +1,27 @@
 require 'csv'
 
-puts "Starting CSV-based data population..."
-
-# Clear existing data
-puts "Clearing existing data..."
-Triple.destroy_all
-Atom.destroy_all
-Creator.destroy_all
-
 # Create system creator
 puts "Creating system creator..."
 Creator.create!(
   label: 'system',
-  image: 'https://avatars.githubusercontent.com/u/583231?v=4' # Default GitHub octocat image
+  image: 'system.png'
 )
 
-# Import atoms
 puts "Importing atoms from CSV..."
 CSV.foreach(Rails.root.join('db/seeds/atoms.csv'), headers: true) do |row|
   Atom.create!(
-    label: row['label'],
-    creator_label: row['creator_label']
+    label: row['name'],
+    creator_label: 'system',
+    metadata: {
+      '@context': row['@context'],
+      '@type': row['@type'],
+      'url': row['url'],
+      'description': row['description'],
+      'image': row['image']
+    }
   )
 end
 
-# Import triples
 puts "Importing triples from CSV..."
 CSV.foreach(Rails.root.join('db/seeds/triples.csv'), headers: true) do |row|
   Triple.create!(
@@ -41,4 +38,4 @@ CSV.foreach(Rails.root.join('db/seeds/triples.csv'), headers: true) do |row|
   )
 end
 
-puts "CSV data population completed successfully!"
+puts "Seed completed successfully!"
