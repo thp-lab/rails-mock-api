@@ -13,7 +13,15 @@
   </head>
 
   <body>
-    <div class="join-banner">
+    <button class="show-banner-button" id="showBanner">
+      <i class="fas fa-arrow-right"></i>
+      <span>see banner</span>
+    </button>
+
+    <div class="join-banner" id="joinBanner">
+      <button class="banner-close" aria-label="Close banner">
+        <i class="fas fa-times"></i>
+      </button>
       <div class="join-banner-container">
         <div class="join-banner-image">
           <%= image_tag "Leonardo_Phoenix_I_want_an_image_of_a_nested_box_that_reflects_3.jpg", alt: "Nested box reflection" %>
@@ -59,5 +67,32 @@
     <%= yield %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const banner = document.getElementById('joinBanner');
+        const closeButton = document.querySelector('.banner-close');
+        const showButton = document.getElementById('showBanner');
+        
+        // Check if banner was previously closed
+        if (localStorage.getItem('bannerClosed') === 'true') {
+          banner.style.display = 'none';
+          showButton.style.display = 'flex';
+        } else {
+          showButton.style.display = 'none';
+        }
+
+        closeButton.addEventListener('click', function() {
+          banner.style.display = 'none';
+          showButton.style.display = 'flex';
+          localStorage.setItem('bannerClosed', 'true');
+        });
+
+        showButton.addEventListener('click', function() {
+          banner.style.display = 'block';
+          showButton.style.display = 'none';
+          localStorage.setItem('bannerClosed', 'false');
+        });
+      });
+    </script>
   </body>
 </html>
