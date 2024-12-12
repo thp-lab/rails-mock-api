@@ -1,6 +1,6 @@
 .show-banner-button {
     position: fixed;
-    top: 1rem;
+    top: 0rem;
     left: 1rem;
     background: none;
     border: none;
@@ -73,6 +73,10 @@
 .join-banner-content {
     flex: 1;
 }
+.join-banner-content b {
+    color:white;
+}
+
 
 .join-banner-title {
     font-size: 3.5rem;
