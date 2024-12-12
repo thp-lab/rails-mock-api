@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # NLP route
+  post 'nlp/generate', to: 'nlp#generate'
+
   # HTML view route
   root 'triple#index'
   resources :triple, only: [ :index, :create ]
