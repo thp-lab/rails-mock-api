@@ -11,8 +11,8 @@ class NlpController < ApplicationController
       return
     end
 
-    # Passage correct de l'api_key en tant qu'argument nommé
-    nlp_service = NlpService.new(api_key: api_key)
+    # Passez la clé API correctement à NlpService
+    nlp_service = NlpService.new(api_key)
     result = nlp_service.generate_triples_and_text(prompt)
 
     # Enregistrement des triples dans la base de données
