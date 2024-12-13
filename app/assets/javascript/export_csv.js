@@ -6,22 +6,31 @@ document.addEventListener('DOMContentLoaded', () => {
   if (exportButton) {
     exportButton.addEventListener('click', async () => {
       try {
-        // Fetch the CSV data from the backend
-        const response = await fetch('/export-csv');
+        // Download atoms.csv
+        const atomsResponse = await fetch('/export-csv?type=atoms');
+        if (!atomsResponse.ok) throw new Error('Failed to download atoms CSV');
+        const atomsBlob = await atomsResponse.blob();
+        const atomsUrl = window.URL.createObjectURL(atomsBlob);
+        const atomsLink = document.createElement('a');
+        atomsLink.href = atomsUrl;
+        atomsLink.download = 'atoms.csv';
+        atomsLink.click();
+        window.URL.revokeObjectURL(atomsUrl);
 
-        if (!response.ok) throw new Error('Failed to download CSV');
+        // Small delay between downloads
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+        // Download triples.csv
+        const triplesResponse = await fetch('/export-csv?type=triples');
+        if (!triplesResponse.ok) throw new Error('Failed to download triples CSV');
+        const triplesBlob = await triplesResponse.blob();
+        const triplesUrl = window.URL.createObjectURL(triplesBlob);
+        const triplesLink = document.createElement('a');
+        triplesLink.href = triplesUrl;
+        triplesLink.download = 'triples.csv';
+        triplesLink.click();
+        window.URL.revokeObjectURL(triplesUrl);
 
-        // Trigger the file download
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'export.zip';  // Changed to .zip since we're downloading a ZIP file
-        link.click();
-
-        // Clean up
-        window.URL.revokeObjectURL(url);
       } catch (error) {
         alert('Error exporting CSV: ' + error.message);
       }
