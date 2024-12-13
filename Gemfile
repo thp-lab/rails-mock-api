@@ -39,11 +39,13 @@ gem "thruster", require: false
 # gem "rack-cors"
 
 # Use rubyzip for handling ZIP files
-gem 'rubyzip'
+gem "rubyzip"
 
-gem 'dotenv'
+gem "dotenv"
 
-gem 'ruby-openai', '~> 7.1'
+gem "ruby-openai", "~> 7.1"
+
+gem "http"
 
 
 group :development, :test do
