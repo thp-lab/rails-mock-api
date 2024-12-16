@@ -28,23 +28,57 @@ class NlpService
 { "subject": "<sujet>", "predicate": "<prédicat>", "object": "<objet>" }.
 
 Cependant, certains sujets, prédicats ou objets dans un triple peuvent eux-mêmes être des triples imbriqués. Vous devez les traiter de manière récursive, où un triple peut contenir un autre triple en tant qu'objet, sujet ou prédicat.
+Assurez-vous que la sortie est strictement au format JSON valide. Ne mélangez pas des chaînes de texte dans le même champ que les triples. Utilisez le format suivant pour vos sorties :
 
-Vous devez également produire une interprétation textuelle de la sémantique des triples précédemment créés, en les structurant pour en faire une recommandation claire, concise.
+1. **Triples RDF** :
+Générez un tableau de triples au format suivant. Si un triple contient un objet ou un sujet imbriqué, il doit être représenté comme un objet JSON à l’intérieur du triple.
 
-**Exemple :**
-Texte d'entrée :
-"L'étudiant Jean Dupont a complété avec succès le programme Python intensif de THP. Il a démontré une maîtrise exceptionnelle du langage, en résolvant des problèmes complexes et en développant des projets ambitieux."
+2. **Interprétation textuelle** :
+   Vous devez également produire une interprétation textuelle de la sémantique des triples précédemment créés, en les structurant pour en faire une recommandation claire, concise. Cela ne doit pas interférer avec les triples générés.
 
-**Résultat attendu :**
 
-**1. Triples RDF**
+Lorsque c'est possible, structurez les triples de manière imbriquée pour représenter les relations complexes ou hiérarchiques décrites dans le texte.
+
+
+**1.Structure du format Json attendu **
 ```json
-[
-  { "subject": "Jean Dupont", "predicate": "a complété", "object": "Programme Python intensif de THP" },
-  { "subject": "Jean Dupont", "predicate": "a démontré", "object": "Maîtrise exceptionnelle du langage Python" },
-  { "subject": "Maîtrise exceptionnelle du langage Python", "predicate": "inclut", "object": "Résolution de problèmes complexes" },
-  { "subject": "Maîtrise exceptionnelle du langage Python", "predicate": "inclut", "object": "Développement de projets ambitieux" }
-]
+{
+triples:[
+  { "subject": "Jean Dupont", "predicate": "a complété", "object": {
+      "subject": "Formation Fullstack",
+      "predicate": "session",
+      "object": "Automne 2024 de THP"
+    }
+  },
+  { "subject": "Jean Dupont"
+   , "predicate": "a démontré", "object": {
+      "subject": "Maîtrise des langages",
+      "predicate": "inclut",
+      "object": [
+        { "subject": "Langage", "predicate": "inclut", "object": "Javascript" },
+        { "subject": "Langage", "predicate": "inclut", "object": "Ruby" },
+        { "subject": "Langage", "predicate": "inclut", "object": "React" }
+      ]
+    }
+  },
+  { "subject": "Jean Dupont", "predicate": "a travaillé sur", "object": {
+      "subject": "Projet final",
+      "predicate": "thème",
+      "object": {
+        "subject": "Thème",
+        "predicate": "est basé sur",
+        "object": [
+          { "subject": "Format RDF", "predicate": "est", "object": "Technologie" },
+          { "subject": "Protocole de Intuition,", "predicate": "utilise", "object": "Format RDF" }
+        ]
+      }
+    }
+  }
+
+],
+ enriched_text :
+"Jean Dupont a réussi la formation Fullstack, session automne 2024 de THP, démontrant une maîtrise des langages Javascript, Ruby et React. Il a également appliqué ces compétences dans le projet final, en utilisant le format RDF et le protocole de Intuition."
+}
 
             SYSTEM
           },
